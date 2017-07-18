@@ -12,5 +12,10 @@
 
   <AccueilVoiceChannelName>Accueil</AccueilVoiceChannelName>
 
-  <WelcomeMessage>Bienvenue !</WelcomeMessage>
+  <WelcomeMessage>Bonjour !
+Je suis un petit bot en cours de construction pour le serveur, mais, au nom de la P.A.C., je te souhaite la bienvenue !
+Je viens de prévenir les membres du Staff connectés sur le serveur actuellement, ils ne devraient pas tarder à arriver !
+Tu peux, en attendant visiter notre site (https://www.pa-corp.fr/), et même y déposer ta candidature si tu le souhaites !
+A bientôt !
+  </WelcomeMessage>
 </config>

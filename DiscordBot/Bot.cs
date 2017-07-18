@@ -36,7 +36,7 @@ namespace DiscordBot
             DiscordClient.MessageReceived += MessageReceived;
             DiscordClient.Ready += Ready;
             DiscordClient.UserVoiceStateUpdated += VoiceStateUpdated;
-            //DiscordClient.UserJoined += OnUserJoined;
+            DiscordClient.UserJoined += OnUserJoined;
 
             await DiscordClient.LoginAsync(TokenType.Bot, Data.Token);
             State = EBotState.Ready;
@@ -48,10 +48,10 @@ namespace DiscordBot
             State = EBotState.Exit;
         }
 
-        /*private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
+        private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
         {
             await _socketGuildUser.CreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
-        }*/
+        }
 
 #pragma warning disable CS1998
         private static async Task VoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
