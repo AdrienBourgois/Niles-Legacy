@@ -2,18 +2,18 @@
 <CommandList>
 
   <!-- Public Commands -->
-  <Command name="ok?" admin="false" log="{NAME} a vérifié si le bot était up." description="Vérifier si le bot est up !">
+  <Command name="ok?" admin="false" log="{USER} a vérifié si le bot était up." description="Vérifier si le bot est up !">
     <List>
       <Action function="Reply">Tout est ok !</Action>
       <Action function="React"/>
     </List>
   </Command>
-  <Command name="channel" admin="false" log="{NAME} a crée un channel." description="Créer un nouveau channel temporaire avec le nom voulu">
+  <Command name="channel" admin="false" log="{USER} a crée le channel {PARAMETER}." description="Créer un nouveau channel temporaire avec le nom voulu">
     <List>
       <Action function="CreateChannel" />
     </List>
   </Command>
-  <Command name="help" admin="false" log="{NAME} a affiché l'aide." description="Affiche cette liste">
+  <Command name="help" admin="false" log="{USER} a affiché l'aide." description="Affiche cette liste">
     <List>
       <Action function="SendHelpList"/>
     </List>

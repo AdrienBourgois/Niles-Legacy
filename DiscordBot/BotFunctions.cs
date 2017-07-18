@@ -215,7 +215,7 @@ namespace DiscordBot
 
         public static async void SendToLog(SocketMessage _message, string _text)
         {
-            string replace = _text.Replace("{NAME}", _message.Author.Username);
+            string replace = _text.Replace("{USER}", _message.Author.Username).Replace("{PARAMETER}", _text);
 
             foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
             {
