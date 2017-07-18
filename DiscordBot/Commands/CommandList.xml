@@ -8,9 +8,9 @@
       <Action function="React"/>
     </List>
   </Command>
-  <Command name="channel" admin="false" log="{USER} a crée le channel {PARAMETER}." description="Créer un nouveau channel temporaire avec le nom voulu">
+  <Command name="channel" admin="false" description="Créer un nouveau channel temporaire avec le nom voulu">
     <List>
-      <Action function="CreateChannel" />
+      <Action function="CreateChannel" log="{USER} a crée le channel {PARAMETER}."/>
     </List>
   </Command>
   <Command name="help" admin="false" log="{USER} a affiché l'aide." description="Affiche cette liste">

@@ -213,9 +213,16 @@ namespace DiscordBot
             ProcessMessage.CommandList.PrepareCommands();
         }
 
-        public static async void SendToLog(SocketMessage _message, string _text)
+        public static async void SendToLog(SocketMessage _message, string _text, string _parameter)
         {
-            string replace = _text.Replace("{USER}", _message.Author.Username).Replace("{PARAMETER}", _text);
+            if (_text == null)
+                return;
+
+            string replace = _text;
+            if(_text.Contains("{USER}"))
+                replace = replace.Replace("{USER}", _message.Author.Username);
+            if (_text.Contains("{PARAMETER}"))
+                replace = replace.Replace("{PARAMETER}", _message.Content.Substring(_message.Content.IndexOf(' ') + 1));
 
             foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
             {
