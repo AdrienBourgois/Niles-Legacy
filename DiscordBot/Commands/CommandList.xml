@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CommandList>
+
+  <!-- Public Commands -->
+  <Command name="ok?" admin="false" log="{NAME} a vérifié si le bot était up." description="Vérifier si le bot est up !">
+    <List>
+      <Action function="Reply">Tout est ok !</Action>
+      <Action function="React"/>
+    </List>
+  </Command>
+  <Command name="channel" admin="false" log="{NAME} a crée un channel." description="Créer un nouveau channel temporaire avec le nom voulu">
+    <List>
+      <Action function="CreateChannel" />
+    </List>
+  </Command>
+  <Command name="help" admin="false" log="{NAME} a affiché l'aide." description="Affiche cette liste">
+    <List>
+      <Action function="SendHelpList"/>
+    </List>
+  </Command>
+
+  <!-- Admins Commands -->
+  <Command name="stop" admin="true">
+    <List>
+      <Action function="Reply">Bye !</Action>
+      <Action function="StopBot"/>
+    </List>
+  </Command>
+  <Command name="annonce" admin="true">
+    <List>
+      <Action function="Annonce" />
+    </List>
+  </Command>
+  <Command name="sendToAll" admin="true">
+    <List>
+      <Action function="SendToAllPlayers" />
+    </List>
+  </Command>
+  <Command name="differed" admin="true">
+    <List>
+      <Action function="AddDifferedMessage" />
+    </List>
+  </Command>
+  <Command name="send" admin="true">
+    <List>
+      <Action function="SendToGeneralChannelAsBot" />
+    </List>
+  </Command>
+  <Command name="reload" admin="true">
+    <List>
+      <Action function="ReloadConfig" />
+    </List>
+  </Command>
+
+</CommandList>
