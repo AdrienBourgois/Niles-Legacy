@@ -7,8 +7,15 @@ namespace DiscordBot
     {
         public static bool IsFromAdmin(SocketMessage _message)
         {
-            ulong[] adminsList = { 156607889958502401 };
-            return adminsList.Contains(_message.Author.Id);
+            string[] rolesStaffNames = {"Fondateur", "Administrateur", "Modérateur", "Leader"};
+            SocketGuildUser user = Data.Guild.GetUser(_message.Author.Id);
+            return user.Roles.Any(_role => rolesStaffNames.Contains(_role.Name));
+        }
+
+        public static bool IsAdmin(SocketGuildUser _user)
+        {
+            string[] rolesStaffNames = { "Fondateur", "Administrateur", "Modérateur", "Leader" };
+            return _user.Roles.Any(_role => rolesStaffNames.Contains(_role.Name));
         }
     }
 }

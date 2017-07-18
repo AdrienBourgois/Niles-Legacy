@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Rest;
@@ -132,20 +131,9 @@ namespace DiscordBot
 
         public static async void SendToStaffMembers(SocketMessage _message, string _text)
         {
-            SocketRole staffRole = null;
-
-            foreach (SocketRole role in Data.Guild.Roles)
-            {
-                if (role.Name == Data.Configuration["StaffRoleName"])
-                    staffRole = role;
-            }
-
-            if (staffRole == null)
-                return;
-
             foreach (SocketGuildUser user in Data.Guild.Users)
             {
-                if (!user.Roles.Contains(staffRole)) continue;
+                if (!Tools.IsAdmin(user)) continue;
 
                 RestDMChannel dmChannel = user.CreateDMChannelAsync().Result;
                 await dmChannel.SendMessageAsync(_text);
@@ -154,20 +142,9 @@ namespace DiscordBot
 
         public static async void SendToConnectedStaffMembers(SocketMessage _message, string _text)
         {
-            SocketRole staffRole = null;
-
-            foreach (SocketRole role in Data.Guild.Roles)
-            {
-                if (role.Name == Data.Configuration["StaffRoleName"])
-                    staffRole = role;
-            }
-
-            if (staffRole == null)
-                return;
-
             foreach (SocketGuildUser user in Data.Guild.Users)
             {
-                if (!user.Roles.Contains(staffRole)) continue;
+                if (!Tools.IsAdmin(user)) continue;
                 if (user.Status != UserStatus.Online) continue;
 
                 RestDMChannel dmChannel = user.CreateDMChannelAsync().Result;
