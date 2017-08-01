@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
+using DiscordBot.Interface;
 
 namespace DiscordBot
 {
-    internal class DifferedMessagesManager
+    internal class DifferedMessagesManager : IModule
     {
+        public bool IsRealTime { get; set; } = true;
+
         private static int currentId = 1;
 
         private static readonly Dictionary<string, DifferedMessage> DifferedMessages = new Dictionary<string, DifferedMessage>();
@@ -33,6 +36,16 @@ namespace DiscordBot
 
                 break;
             }
+        }
+
+        public void Start()
+        {
+
+        }
+
+        public void Stop()
+        {
+
         }
 
         public void Update()

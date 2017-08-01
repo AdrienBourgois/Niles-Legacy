@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
+using DiscordBot.Managers;
 
 namespace DiscordBot
 {
@@ -13,6 +12,11 @@ namespace DiscordBot
             Bot.AskToStop();
         }
 
+        public static void Sleep(SocketMessage _message, string _text)
+        {
+            Bot.Sleep();
+        }
+
         public static async void React(SocketMessage _message, string _text)
         {
             SocketUserMessage userMessage = (SocketUserMessage)_message;
@@ -21,7 +25,7 @@ namespace DiscordBot
 
         public static async void ReplyDm(SocketMessage _message, string _text)
         {
-            RestDMChannel dm = _message.Author.CreateDMChannelAsync().Result;
+            IDMChannel dm = _message.Author.GetOrCreateDMChannelAsync().Result;
             await dm.SendMessageAsync(_text);
         }
 
@@ -47,9 +51,8 @@ namespace DiscordBot
             {
                 if (user.IsBot) continue;
 
-                Task<RestDMChannel> dmTask = user.CreateDMChannelAsync();
-                dmTask.Wait();
-                await dmTask.Result.SendMessageAsync(messageString);
+                IDMChannel dm = user.GetOrCreateDMChannelAsync().Result;
+                await dm.SendMessageAsync(messageString);
             }
         }
 
@@ -67,9 +70,8 @@ namespace DiscordBot
             {
                 if (user.IsBot) continue;
 
-                Task<RestDMChannel> dmTask = user.CreateDMChannelAsync();
-                dmTask.Wait();
-                await dmTask.Result.SendMessageAsync(messageString);
+                IDMChannel dm = user.GetOrCreateDMChannelAsync().Result;
+                await dm.SendMessageAsync(messageString);
             }
         }
 
@@ -135,7 +137,7 @@ namespace DiscordBot
             {
                 if (!Tools.IsAdmin(user)) continue;
 
-                RestDMChannel dmChannel = user.CreateDMChannelAsync().Result;
+                IDMChannel dmChannel = user.GetOrCreateDMChannelAsync().Result;
                 await dmChannel.SendMessageAsync(_text);
             }
         }
@@ -147,14 +149,14 @@ namespace DiscordBot
                 if (!Tools.IsAdmin(user)) continue;
                 if (user.Status != UserStatus.Online) continue;
 
-                RestDMChannel dmChannel = user.CreateDMChannelAsync().Result;
+                IDMChannel dmChannel = user.GetOrCreateDMChannelAsync().Result;
                 await dmChannel.SendMessageAsync(_text);
             }
         }
 
         public static async void SendToMaster(SocketMessage _message, string _text)
         {
-            await Bot.DiscordClient.GetUser(ulong.Parse(Data.Configuration["MasterId"])).CreateDMChannelAsync()
+            await Bot.DiscordClient.GetUser(ulong.Parse(Data.Configuration["MasterId"])).GetOrCreateDMChannelAsync()
                 .Result.SendMessageAsync("Send from " + _message.Author + " : " + _message.Content);
         }
 
@@ -168,7 +170,7 @@ namespace DiscordBot
                 return;
             }
 
-            RealTimeUpdate.ChannelManager.CreateChannel((SocketGuildUser) _message.Author, name);
+            ModuleManager.GetModule<ChannelManager>().CreateChannel((SocketGuildUser) _message.Author, name);
         }
 
         public static async void SendHelpList(SocketMessage _message, string _text)
@@ -180,6 +182,29 @@ namespace DiscordBot
                 if(!command.AdminCommand)
                     answer += "- !" + command.Name + " : " + command.Description + '\n';
             }
+            answer += "\n```";
+
+            await _message.Channel.SendMessageAsync(answer);
+        }
+
+        public static async void SendAdminHelpList(SocketMessage _message, string _text)
+        {
+            string answer = "Liste des commandes : \n```\n";
+            foreach (KeyValuePair<string, Command> commandPair in ProcessMessage.CommandList.Commands)
+            {
+                Command command = commandPair.Value;
+                if (!command.AdminCommand)
+                    answer += "- !" + command.Name + " : " + command.Description + '\n';
+            }
+            answer += "```\nListe des commandes administateurs : \n```\n";
+
+            foreach (KeyValuePair<string, Command> commandPair in ProcessMessage.CommandList.Commands)
+            {
+                Command command = commandPair.Value;
+                if (command.AdminCommand)
+                    answer += "- !" + command.Name + " : " + command.Description + '\n';
+            }
+
             answer += "\n```";
 
             await _message.Channel.SendMessageAsync(answer);

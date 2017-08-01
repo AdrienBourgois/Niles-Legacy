@@ -2,7 +2,7 @@
 <CommandList>
 
   <!-- Public Commands -->
-  <Command name="ok?" admin="false" log="{USER} a vérifié si le bot était up." description="Vérifier si le bot est up !">
+  <Command name="ok?" admin="false" description="Vérifier si le bot est up !">
     <List>
       <Action function="Reply">Tout est ok !</Action>
       <Action function="React"/>
@@ -20,33 +20,38 @@
   </Command>
 
   <!-- Admins Commands -->
-  <Command name="stop" admin="true">
+  <Command name="stop" admin="true" description="Arrête le bot">
     <List>
       <Action function="Reply">Bye !</Action>
       <Action function="StopBot"/>
     </List>
   </Command>
-  <Command name="annonce" admin="true">
+  <Command name="sleep" admin="true" description="Désactive le bot">
+    <List>
+      <Action function="Sleep"/>
+    </List>
+  </Command>
+  <Command name="helpAdmin" admin="true" description="Affiche cette liste (version admin)">
+    <List>
+      <Action function="SendAdminHelpList"/>
+    </List>
+  </Command>
+  <Command name="annonce" admin="true" description="Envoi d'un message en MP à tout les membres et dans le channel Annonces">
     <List>
       <Action function="Annonce" />
     </List>
   </Command>
-  <Command name="sendToAll" admin="true">
+  <Command name="sendToAll" admin="true" description="Envoi d'un message en MP à tout les membres">
     <List>
       <Action function="SendToAllPlayers" />
     </List>
   </Command>
-  <Command name="differed" admin="true">
-    <List>
-      <Action function="AddDifferedMessage" />
-    </List>
-  </Command>
-  <Command name="send" admin="true">
+  <Command name="send" admin="true" description="Envoi d'un message sur le channel General au nom du bot">
     <List>
       <Action function="SendToGeneralChannelAsBot" />
     </List>
   </Command>
-  <Command name="reload" admin="true">
+  <Command name="reload" admin="true" description="Reconfigure les commandes avec le fichier de configuration (CommandList.xml)">
     <List>
       <Action function="ReloadConfig" />
     </List>

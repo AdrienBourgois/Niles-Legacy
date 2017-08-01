@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc2" />
-    <PackageReference Include="Syn.Bot" Version="2.1.3" />
+    <PackageReference Include="Discord.Net" Version="1.0.1" />
+    <PackageReference Include="Syn.Bot" Version="2.5.7" />
   </ItemGroup>
 
 </Project>

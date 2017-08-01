@@ -10,14 +10,17 @@ namespace DiscordBot
     {
         public static readonly DiscordSocketClient DiscordClient = new DiscordSocketClient();
 
-        private static readonly RealTimeUpdate RealTime = new RealTimeUpdate();
+        private static readonly ModuleManager Modules = new ModuleManager();
 
         public enum EBotState
         {
             Starting,
             Ready,
             Running,
-            AskToStop,
+            Sleep,
+            AskToShutdown,
+            ReadyToShutdown,
+            Shutdown,
             Exit
         }
 
@@ -44,18 +47,20 @@ namespace DiscordBot
             await DiscordClient.StartAsync();
             State = EBotState.Running;
 
-            await RealTime.StartUpdate();
+            Modules.Start();
+
+            Modules.Update();
+
             State = EBotState.Exit;
         }
 
         private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
         {
-            await _socketGuildUser.CreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
+            await _socketGuildUser.GetOrCreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
         }
 
-#pragma warning disable CS1998
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private static async Task VoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
-#pragma warning restore CS1998
         {
             SocketGuildUser user = Data.Guild.GetUser(_socketUser.Id);
 
@@ -66,9 +71,7 @@ namespace DiscordBot
                             BotFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
         }
 
-#pragma warning disable CS1998
         private static async Task MessageReceived(SocketMessage _message)
-#pragma warning restore CS1998
         {
             if(!_message.Author.IsBot)
             {
@@ -79,16 +82,47 @@ namespace DiscordBot
             }
         }
 
-#pragma warning disable CS1998
+        private static async Task MessageReceivedOnSleep(SocketMessage _message)
+        {
+            if (_message.Content == "-> Sleep" && Tools.IsFromAdmin(_message))
+                WakeUp();
+        }
+
         private static async Task Ready()
-#pragma warning restore CS1998
         {
             Data.Guild = DiscordClient.GetGuild(ulong.Parse(Data.Configuration["GuildId"]));
         }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         public static void AskToStop()
         {
-            State = EBotState.AskToStop;
+            State = EBotState.AskToShutdown;
+        }
+
+        public static void Sleep()
+        {
+            State = EBotState.Sleep;
+
+            DiscordClient.Log -= Log;
+            DiscordClient.MessageReceived -= MessageReceived;
+            DiscordClient.Ready -= Ready;
+            DiscordClient.UserVoiceStateUpdated -= VoiceStateUpdated;
+            DiscordClient.UserJoined -= OnUserJoined;
+
+            DiscordClient.MessageReceived += MessageReceivedOnSleep;
+        }
+
+        private static void WakeUp()
+        {
+            State = EBotState.Running;
+
+            DiscordClient.Log += Log;
+            DiscordClient.MessageReceived += MessageReceived;
+            DiscordClient.Ready += Ready;
+            DiscordClient.UserVoiceStateUpdated += VoiceStateUpdated;
+            DiscordClient.UserJoined += OnUserJoined;
+
+            DiscordClient.MessageReceived -= MessageReceivedOnSleep;
         }
 
         private static Task Log(LogMessage _msg)

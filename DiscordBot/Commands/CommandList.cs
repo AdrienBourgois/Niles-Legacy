@@ -55,6 +55,8 @@ namespace DiscordBot
                     }
                 }
             }
+
+            xmlReader.Dispose();
         }
 
         public void ExecuteCommand(SocketMessage _message)

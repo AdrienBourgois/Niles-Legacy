@@ -5,17 +5,17 @@ namespace DiscordBot
 {
     internal static class Tools
     {
+        private static readonly string[] RolesStaffNames = { "Fondateur", "Administrateur", "Modérateur", "Leader" };
+
         public static bool IsFromAdmin(SocketMessage _message)
         {
-            string[] rolesStaffNames = {"Fondateur", "Administrateur", "Modérateur", "Leader"};
             SocketGuildUser user = Data.Guild.GetUser(_message.Author.Id);
-            return user.Roles.Any(_role => rolesStaffNames.Contains(_role.Name));
+            return user.Roles.Any(_role => RolesStaffNames.Contains(_role.Name));
         }
 
         public static bool IsAdmin(SocketGuildUser _user)
         {
-            string[] rolesStaffNames = { "Fondateur", "Administrateur", "Modérateur", "Leader" };
-            return _user.Roles.Any(_role => rolesStaffNames.Contains(_role.Name));
+            return _user.Roles.Any(_role => RolesStaffNames.Contains(_role.Name));
         }
     }
 }
