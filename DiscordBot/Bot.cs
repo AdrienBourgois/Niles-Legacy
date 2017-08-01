@@ -128,7 +128,7 @@ namespace DiscordBot
         private static Task Log(LogMessage _msg)
         {
             Console.WriteLine(_msg.ToString());
-            return Task.CompletedTask;
+            return null;
         }
     }
 }

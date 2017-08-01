@@ -34,7 +34,7 @@ namespace DiscordBot.Managers
             foreach (KeyValuePair<ulong, IVoiceChannel> channelPair in temporaryChannels)
             {
                 SocketVoiceChannel channel = Data.Guild.GetVoiceChannel(channelPair.Value.Id);
-                if (channel.Users.Count != 0 || DateTimeOffset.Now < channel.CreatedAt.AddSeconds(5)) continue;
+                if (channel.Users.Count != 0 || DateTimeOffset.Now < channel.CreatedAt.AddMinutes(1)) continue;
 
                 await channel.DeleteAsync();
                 temporaryChannels.TryRemove(channel.Id, out IVoiceChannel _);
