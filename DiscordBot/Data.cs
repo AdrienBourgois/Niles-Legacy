@@ -14,8 +14,6 @@ namespace DiscordBot
 
         public static SocketGuild Guild { get; set; }
 
-        public static readonly Queue<SocketMessage> Packages = new Queue<SocketMessage>();
-
         public static void LoadConfig()
         {
             string content = File.ReadAllText("config.xml");

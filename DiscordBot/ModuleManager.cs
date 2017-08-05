@@ -54,5 +54,14 @@ namespace DiscordBot
                 Thread.Sleep(1000);
             }
         }
+
+        public void Shutdown()
+        {
+            foreach (IModule module in Modules)
+            {
+                module.Stop();
+                Bot.State = Bot.EBotState.ReadyToShutdown;
+            }
+        }
     }
 }

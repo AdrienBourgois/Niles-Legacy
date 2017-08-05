@@ -15,7 +15,7 @@ namespace DiscordBot
             AdminCommand = _adminCommand;
         }
 
-        public void AddCommand(Action<SocketMessage, string> _action, string _parameter, string _log = null)
+        public void AddCommand(Action<SocketMessage, string, char, string, List<string>> _action, string _parameter, string _log = null)
         {
             if(_action != null)
                 ActionList.Add(new BotTask(_action, _parameter, _log));

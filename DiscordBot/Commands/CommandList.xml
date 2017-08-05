@@ -13,7 +13,7 @@
       <Action function="CreateChannel" log="{USER} a crée le channel {PARAMETER}."/>
     </List>
   </Command>
-  <Command name="help" admin="false" log="{USER} a affiché l'aide." description="Affiche cette liste">
+  <Command name="help" admin="false" description="Affiche cette liste">
     <List>
       <Action function="SendHelpList"/>
     </List>
@@ -54,6 +54,11 @@
   <Command name="reload" admin="true" description="Reconfigure les commandes avec le fichier de configuration (CommandList.xml)">
     <List>
       <Action function="ReloadConfig" />
+    </List>
+  </Command>
+  <Command name="functions" admin="true" description="Méthodes internes du bot utilisables pour le fichier de configuration">
+    <List>
+      <Action function="GetFunctionsNames" />
     </List>
   </Command>
 

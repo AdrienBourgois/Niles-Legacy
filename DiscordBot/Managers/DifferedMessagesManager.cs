@@ -32,7 +32,7 @@ namespace DiscordBot
                 await sendMessage.AddReactionAsync(new Emoji("✅"));
                 await sendMessage.AddReactionAsync(new Emoji("❎"));
 
-                DifferedMessages.Add(id, new DifferedMessage(id, TimeSpan.FromSeconds(_timer), sendMessage, socketTextChannel, new List<Action<SocketMessage, string>> { BotFunctions.Reply }));
+                //DifferedMessages.Add(id, new DifferedMessage(id, TimeSpan.FromSeconds(_timer), sendMessage, socketTextChannel, new List<Action<SocketMessage, string>> { BotFunctions.Reply }));
 
                 break;
             }

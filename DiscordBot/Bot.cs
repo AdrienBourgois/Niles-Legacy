@@ -24,7 +24,7 @@ namespace DiscordBot
             Exit
         }
 
-        public static EBotState State { get; private set; }
+        internal static EBotState State { get; set; }
 
         public static void Main()
             => MainAsync().GetAwaiter().GetResult();
@@ -35,11 +35,7 @@ namespace DiscordBot
 
             Data.LoadConfig();
 
-            DiscordClient.Log += Log;
-            DiscordClient.MessageReceived += MessageReceived;
-            DiscordClient.Ready += Ready;
-            DiscordClient.UserVoiceStateUpdated += VoiceStateUpdated;
-            DiscordClient.UserJoined += OnUserJoined;
+            ConnectEvents();
 
             await DiscordClient.LoginAsync(TokenType.Bot, Data.Token);
             State = EBotState.Ready;
@@ -51,7 +47,18 @@ namespace DiscordBot
 
             Modules.Update();
 
+            State = EBotState.Shutdown;
+
+            await Shutdown();
+
             State = EBotState.Exit;
+        }
+
+        private static async Task Shutdown()
+        {
+            Modules.Shutdown();
+            await DiscordClient.LogoutAsync();
+            await DiscordClient.StopAsync();
         }
 
         private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
@@ -59,40 +66,40 @@ namespace DiscordBot
             await _socketGuildUser.GetOrCreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private static async Task VoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
+#pragma warning disable CS1998
+        private static async Task OnVoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
         {
             SocketGuildUser user = Data.Guild.GetUser(_socketUser.Id);
 
-            if(user.Roles.Count() == 1 && user.Roles.First().IsEveryone)
+            if(user.Roles.Count == 1 && user.Roles.First().IsEveryone)
                 if (_fromState.VoiceChannel != _toState.VoiceChannel)
                     if(_toState.VoiceChannel != null)
                         if (_toState.VoiceChannel.Name.Contains(Data.Configuration["AccueilVoiceChannelName"]) && _toState.VoiceChannel.Users.Count == 1)
                             BotFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
         }
 
-        private static async Task MessageReceived(SocketMessage _message)
+        private static async Task OnMessageReceived(SocketMessage _message)
         {
             if(!_message.Author.IsBot)
             {
                 if (!(_message.Channel is IGuildChannel) && _message.Author.Id != ulong.Parse(Data.Configuration["MasterId"]))
                     BotFunctions.SendToMaster(_message, null);
-                Data.Packages.Enqueue(_message);
                 ProcessMessage.Process(_message);
             }
         }
 
         private static async Task MessageReceivedOnSleep(SocketMessage _message)
         {
-            if (_message.Content == "-> Sleep" && Tools.IsFromAdmin(_message))
+            if (_message.Content == "!wakeUp" && Tools.IsFromAdmin(_message))
                 WakeUp();
         }
 
-        private static async Task Ready()
+        private static async Task OnReady()
         {
             Data.Guild = DiscordClient.GetGuild(ulong.Parse(Data.Configuration["GuildId"]));
+            await DiscordClient.SetGameAsync("Version Bêta");
         }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning restore CS1998
 
         public static void AskToStop()
         {
@@ -103,11 +110,7 @@ namespace DiscordBot
         {
             State = EBotState.Sleep;
 
-            DiscordClient.Log -= Log;
-            DiscordClient.MessageReceived -= MessageReceived;
-            DiscordClient.Ready -= Ready;
-            DiscordClient.UserVoiceStateUpdated -= VoiceStateUpdated;
-            DiscordClient.UserJoined -= OnUserJoined;
+            DisconnectEvents();
 
             DiscordClient.MessageReceived += MessageReceivedOnSleep;
         }
@@ -116,13 +119,27 @@ namespace DiscordBot
         {
             State = EBotState.Running;
 
-            DiscordClient.Log += Log;
-            DiscordClient.MessageReceived += MessageReceived;
-            DiscordClient.Ready += Ready;
-            DiscordClient.UserVoiceStateUpdated += VoiceStateUpdated;
-            DiscordClient.UserJoined += OnUserJoined;
+            ConnectEvents();
 
             DiscordClient.MessageReceived -= MessageReceivedOnSleep;
+        }
+
+        private static void ConnectEvents()
+        {
+            DiscordClient.Log += Log;
+            DiscordClient.MessageReceived += OnMessageReceived;
+            DiscordClient.Ready += OnReady;
+            DiscordClient.UserVoiceStateUpdated += OnVoiceStateUpdated;
+            DiscordClient.UserJoined += OnUserJoined;
+        }
+
+        private static void DisconnectEvents()
+        {
+            DiscordClient.Log -= Log;
+            DiscordClient.MessageReceived -= OnMessageReceived;
+            DiscordClient.Ready -= OnReady;
+            DiscordClient.UserVoiceStateUpdated -= OnVoiceStateUpdated;
+            DiscordClient.UserJoined -= OnUserJoined;
         }
 
         private static Task Log(LogMessage _msg)
