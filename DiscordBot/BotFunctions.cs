@@ -4,6 +4,7 @@ using System.Reflection;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Managers;
+using DiscordBot.Types;
 
 namespace DiscordBot
 {
@@ -14,8 +15,9 @@ namespace DiscordBot
             Bot.AskToStop();
         }
 
-        public static void Sleep(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
+        public static async void Sleep(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
+            await _message.Channel.SendMessageAsync("A tout à l'heure ! :wave:");
             Bot.Sleep();
         }
 
@@ -216,7 +218,41 @@ namespace DiscordBot
             ProcessMessage.CommandList.PrepareCommands();
         }
 
-        public static async void SendToLog(SocketMessage _message, string _text, string _parameter)
+        public static async void GetMemberInformations(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
+        {
+            if (_message.MentionedUsers.Count == 0 && (_parameters == null || _parameters.Count == 0 || !Tools.IsMemberIdValid(_parameters[0])))
+            {
+                await _message.Channel.SendMessageAsync(":negative_squared_cross_mark: Erreur : Pas de membre défini");
+                return;
+            }
+
+            ulong id = _message.MentionedUsers.Count != 0
+                ? _message.MentionedUsers.First().Id
+                : ulong.Parse(_parameters?[0]);
+
+            Member member = ModuleManager.GetModule<MembersManagers>().GetMember(id);
+            if(member != null)
+            {
+                Embed memberEmbed = member.GetEmbedInfos();
+                await _message.Channel.SendMessageAsync("", embed: memberEmbed).ConfigureAwait(false);
+            }
+            else
+            {
+                await _message.Channel.SendMessageAsync(":negative_squared_cross_mark: Erreur : Membre inconnu");
+            }
+        }
+
+        public static void SaveMembers(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
+        {
+            ModuleManager.GetModule<MembersManagers>().SaveMembers();
+        }
+
+        public static void LoadMembers(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
+        {
+            ModuleManager.GetModule<MembersManagers>().LoadMembers();
+        }
+
+        public static async void SendToLog(SocketMessage _message, string _text, InputCommand _inputs = null)
         {
             if (_text == null)
                 return;
@@ -224,8 +260,9 @@ namespace DiscordBot
             string replace = _text;
             if(_text.Contains("{USER}"))
                 replace = replace.Replace("{USER}", _message.Author.Username);
-            if (_text.Contains("{PARAMETER}"))
-                replace = replace.Replace("{PARAMETER}", _parameter);
+            if(_inputs != null)
+                if (_text.Contains("{PARAMETER}"))
+                    replace = replace.Replace("{PARAMETER}", _inputs.Parameters.Aggregate((_i, _j) => _i + ", " + _j));
 
             foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
             {

@@ -61,5 +61,19 @@
       <Action function="GetFunctionsNames" />
     </List>
   </Command>
-
+  <Command name="member" admin="true" description="Donne les informations du membre">
+    <List>
+      <Action function="GetMemberInformations" />
+    </List>
+  </Command>
+  <Command name="load" admin="true" description="Recharge les membres">
+    <List>
+      <Action function="LoadMembers" />
+    </List>
+  </Command>
+  <Command name="save" admin="true" description="Sauvegarde les membres">
+    <List>
+      <Action function="SaveMembers" />
+    </List>
+  </Command>
 </CommandList>

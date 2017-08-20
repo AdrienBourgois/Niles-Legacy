@@ -19,7 +19,7 @@ namespace DiscordBot.Types
             task(_message, configText ?? input.Sentence, input.Discriminator, input.CommandName, input.Parameters);
 
             if (log != null)
-                BotFunctions.SendToLog(_message, log, null);
+                BotFunctions.SendToLog(_message, log, input);
         }
 
         private readonly Action<SocketMessage, string, char, string, List<string>> task;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -64,6 +65,7 @@ namespace DiscordBot
         private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
         {
             await _socketGuildUser.GetOrCreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
+            await Data.Guild.TextChannels.First(_x => _x.Name.Contains(Data.Configuration["GeneralChannelName"])).SendMessageAsync("On souhaite la bienvenue à " + _socketGuildUser.Username + " !");
         }
 
 #pragma warning disable CS1998
@@ -103,6 +105,8 @@ namespace DiscordBot
 
         public static void AskToStop()
         {
+            DisconnectEvents();
+            Thread.Sleep(500);
             State = EBotState.AskToShutdown;
         }
 

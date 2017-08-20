@@ -37,10 +37,10 @@ namespace DiscordBot
                 {
                     if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "Action")
                     {
-                        Action<SocketMessage, string, char, string, List<string>> function = null;
+                        Action<SocketMessage, string, char, string, List<string>> action = null;
                         foreach (MethodInfo methodInfo in botTasksList)
                             if (methodInfo.Name == xmlReader.GetAttribute("function"))
-                                function = (Action<SocketMessage, string, char, string, List<string>>)methodInfo.CreateDelegate(typeof(Action<SocketMessage, string, char, string, List<string>>));
+                                action = (Action<SocketMessage, string, char, string, List<string>>)methodInfo.CreateDelegate(typeof(Action<SocketMessage, string, char, string, List<string>>));
 
                         string actionLog = xmlReader.GetAttribute("log");
 
@@ -48,7 +48,7 @@ namespace DiscordBot
                         typeof(BotFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public);
                         string value = xmlReader.Value;
                         if (value == "\n    ") value = null;
-                        command.AddCommand(function, value, actionLog);
+                        command.AddCommand(action, value, actionLog);
                     }
                     else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Name == "List")
                     {
@@ -78,8 +78,8 @@ namespace DiscordBot
                     return;
             }
             else
-                if(command.LogMessage != "")
-                    BotFunctions.SendToLog(_message, command.LogMessage, null);
+                if(command.CommandLog != "")
+                    BotFunctions.SendToLog(_message, command.CommandLog);
 
             foreach (BotTask action in command.ActionList)
             {

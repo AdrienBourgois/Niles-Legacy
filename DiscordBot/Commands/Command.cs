@@ -11,7 +11,7 @@ namespace DiscordBot
         {
             Name = _name;
             Description = _description;
-            LogMessage = _logMessage;
+            CommandLog = _logMessage;
             AdminCommand = _adminCommand;
         }
 
@@ -23,7 +23,7 @@ namespace DiscordBot
 
         public readonly string Name;
         public readonly string Description;
-        public readonly string LogMessage;
+        public readonly string CommandLog;
         public bool AdminCommand { get; }
         public readonly List<BotTask> ActionList = new List<BotTask>();
     }

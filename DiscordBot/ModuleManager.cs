@@ -11,6 +11,7 @@ namespace DiscordBot
         private readonly Type[] modulesList =
         {
             typeof(ChannelManager),
+            typeof(MembersManagers),
             //typeof(DifferedMessagesManager)
         };
 
