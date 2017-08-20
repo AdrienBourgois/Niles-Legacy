@@ -33,10 +33,10 @@ namespace DiscordBot.Managers
 
         private Task OnUserVoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _previouState, SocketVoiceState _newState)
         {
-            if (_newState.VoiceChannel != null && _newState.VoiceChannel.Guild == Data.Guild)
-            {
-                GetMember(_socketUser.Id).OnConnected();
-            }
+            if (_newState.VoiceChannel == null || _newState.VoiceChannel.Guild != Data.Guild) return null;
+            if (_newState.VoiceChannel.Name.Contains("Absent")) return null;
+
+            GetMember(_socketUser.Id).OnConnected();
 
             return null;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using Discord;
 using Newtonsoft.Json;
@@ -50,7 +51,7 @@ namespace DiscordBot.Types
                 .WithDescription("Fiche de membre")
                 .WithColor(new Color(0x680F90))
                 .WithThumbnailUrl(DiscordUser.GetAvatarUrl())
-                .AddField("Dernière connexion :", LastConnection != DateTime.MinValue ? LastConnection.ToString("G") : "Jamais");
+                .AddField("Dernière connexion Vocale :", LastConnection != DateTime.MinValue ? LastConnection.ToString(@"dd\/MM\/yyyy HH:mm") : "Jamais");
 
             return builder.Build();
 
