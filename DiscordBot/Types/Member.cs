@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using Discord;
 using Newtonsoft.Json;
@@ -7,7 +6,6 @@ using Newtonsoft.Json.Linq;
 
 namespace DiscordBot.Types
 {
-    [JsonObject(MemberSerialization.OptIn)]
     internal class Member
     {
         public Member(IUser _discordUser)

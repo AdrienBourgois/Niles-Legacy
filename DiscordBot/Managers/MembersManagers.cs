@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using DiscordBot.Interface;
@@ -12,10 +13,13 @@ namespace DiscordBot.Managers
     {
         private readonly Dictionary<ulong, Member> members = new Dictionary<ulong, Member>();
 
+        private readonly Timer timer;
+
         public MembersManagers()
         {
             Bot.DiscordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
             Bot.DiscordClient.Ready += delegate { LoadMembers(); return null; };
+            timer = new Timer(SaveMembers);
         }
 
         public Member GetMember(ulong _id)
@@ -54,8 +58,10 @@ namespace DiscordBot.Managers
             }
         }
 
-        public void SaveMembers()
+        public void SaveMembers(object _object = null)
         {
+            Console.WriteLine(DateTime.Now.ToString("g") + "Save members...");
+
             if (Directory.Exists("Save/Members"))
             {
                 DirectoryInfo memberDirectory = new DirectoryInfo("Save/Members");
@@ -71,11 +77,12 @@ namespace DiscordBot.Managers
 
         public void Start()
         {
-
+            timer.Change(TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
         }
 
         public void Stop()
         {
+            timer.Dispose();
             SaveMembers();
         }
 

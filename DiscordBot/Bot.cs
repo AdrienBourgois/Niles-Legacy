@@ -93,7 +93,10 @@ namespace DiscordBot
         private static async Task MessageReceivedOnSleep(SocketMessage _message)
         {
             if (_message.Content == "!wakeUp" && Tools.IsFromAdmin(_message))
+            {
+                await _message.Channel.SendMessageAsync("De retour ! :ok_hand:");
                 WakeUp();
+            }
         }
 
         private static async Task OnReady()

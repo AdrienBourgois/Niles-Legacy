@@ -15,12 +15,14 @@ namespace DiscordBot.Managers
 
         private readonly ConcurrentDictionary<ulong, IVoiceChannel> temporaryChannels = new ConcurrentDictionary<ulong, IVoiceChannel>();
 
-        public async void CreateChannel(SocketGuildUser _user, string _name)
+        public async void CreateChannel(SocketUser _user, string _name)
         {
             RestVoiceChannel channel = await Data.Guild.CreateVoiceChannelAsync(_name);
 
-            if (_user.VoiceChannel != null)
-                await _user.ModifyAsync(_x => _x.Channel = channel);
+            SocketGuildUser guildUser = _user as SocketGuildUser;
+
+            if (guildUser?.VoiceChannel != null)
+                await guildUser.ModifyAsync(_x => _x.Channel = channel);
             temporaryChannels.TryAdd(channel.Id, channel);
         }
 

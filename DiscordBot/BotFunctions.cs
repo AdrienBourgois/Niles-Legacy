@@ -166,7 +166,7 @@ namespace DiscordBot
                 return;
             }
 
-            ModuleManager.GetModule<ChannelManager>().CreateChannel((SocketGuildUser) _message.Author, _sentence);
+            ModuleManager.GetModule<ChannelManager>().CreateChannel(_message.Author, _sentence);
         }
 
         public static async void SendHelpList(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
