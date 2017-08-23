@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Discord;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DiscordBot.Types
@@ -32,6 +31,7 @@ namespace DiscordBot.Types
 
             LastConnection = memberDatas.LastConnection;
 
+            file.Close();
             file.Dispose();
 
             IsValid = true;
@@ -39,7 +39,7 @@ namespace DiscordBot.Types
 
         public void OnConnected()
         {
-            LastConnection = DateTime.Now;
+            LastConnection = Tools.TimeNow();
         }
 
         public Embed GetEmbedInfos()
@@ -65,6 +65,7 @@ namespace DiscordBot.Types
 
             file.Write(saveObject.ToString());
             file.Flush();
+            file.Close();
             file.Dispose();
         }
 
@@ -72,7 +73,6 @@ namespace DiscordBot.Types
 
         public readonly IUser DiscordUser;
 
-        [JsonProperty]
         private DateTime LastConnection { get; set; } = DateTime.MinValue;
     }
 }

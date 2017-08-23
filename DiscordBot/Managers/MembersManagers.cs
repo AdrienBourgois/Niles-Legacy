@@ -60,8 +60,6 @@ namespace DiscordBot.Managers
 
         public void SaveMembers(object _object = null)
         {
-            Console.WriteLine(DateTime.Now.ToString("g") + "Save members...");
-
             if (Directory.Exists("Save/Members"))
             {
                 DirectoryInfo memberDirectory = new DirectoryInfo("Save/Members");
@@ -85,12 +83,5 @@ namespace DiscordBot.Managers
             timer.Dispose();
             SaveMembers();
         }
-
-        public void Update()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsRealTime { get; set; } = false;
     }
 }

@@ -9,10 +9,8 @@ using DiscordBot.Interface;
 
 namespace DiscordBot.Managers
 {
-    internal class ChannelManager : IModule
+    internal class ChannelManager : IRealTimeModule
     {
-        public bool IsRealTime { get; set; } = true;
-
         private readonly ConcurrentDictionary<ulong, IVoiceChannel> temporaryChannels = new ConcurrentDictionary<ulong, IVoiceChannel>();
 
         public async void CreateChannel(SocketUser _user, string _name)

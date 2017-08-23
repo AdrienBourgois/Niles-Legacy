@@ -4,13 +4,14 @@ using System.Reflection;
 using System.Xml;
 using Discord;
 using Discord.WebSocket;
+using DiscordBot.Interface;
 using DiscordBot.Types;
 
-namespace DiscordBot
+namespace DiscordBot.Managers
 {
-    internal class CommandList
+    internal class CommandManager : IModule
     {
-        public CommandList()
+        public CommandManager()
         {
             PrepareCommands();
         }
@@ -85,6 +86,16 @@ namespace DiscordBot
             {
                 action.Execute(_message);
             }
+        }
+
+        public void Start()
+        {
+            PrepareCommands();
+        }
+
+        public void Stop()
+        {
+
         }
     }
 }

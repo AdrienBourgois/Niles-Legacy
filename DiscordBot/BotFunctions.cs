@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Discord;
@@ -8,6 +9,8 @@ using DiscordBot.Types;
 
 namespace DiscordBot
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     internal static class BotFunctions
     {
         public static void StopBot(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
@@ -73,11 +76,6 @@ namespace DiscordBot
                 IDMChannel dm = user.GetOrCreateDMChannelAsync().Result;
                 await dm.SendMessageAsync(_sentence);
             }
-        }
-
-        public static void AddDifferedMessage(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            DifferedMessagesManager.AddDifferedMessage(_message, 20);
         }
 
         public static async void Reply(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
@@ -172,7 +170,7 @@ namespace DiscordBot
         public static async void SendHelpList(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
             string answer = "Liste des commandes : \n```\n";
-            foreach (KeyValuePair<string, Command> commandPair in ProcessMessage.CommandList.Commands)
+            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
             {
                 Command command = commandPair.Value;
                 if(!command.AdminCommand)
@@ -186,7 +184,7 @@ namespace DiscordBot
         public static async void SendAdminHelpList(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
             string answer = "Liste des commandes : \n```\n";
-            foreach (KeyValuePair<string, Command> commandPair in ProcessMessage.CommandList.Commands)
+            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
             {
                 Command command = commandPair.Value;
                 if (!command.AdminCommand)
@@ -194,7 +192,7 @@ namespace DiscordBot
             }
             answer += "```\nListe des commandes administateurs : \n```\n";
 
-            foreach (KeyValuePair<string, Command> commandPair in ProcessMessage.CommandList.Commands)
+            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
             {
                 Command command = commandPair.Value;
                 if (command.AdminCommand)
@@ -215,7 +213,7 @@ namespace DiscordBot
 
         public static void ReloadConfig(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
-            ProcessMessage.CommandList.PrepareCommands();
+            ModuleManager.GetModule<CommandManager>().PrepareCommands();
         }
 
         public static async void GetMemberInformations(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)

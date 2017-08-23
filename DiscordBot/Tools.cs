@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Discord.WebSocket;
 
@@ -23,6 +24,11 @@ namespace DiscordBot
         {
             Regex regex = new Regex("^[0-9]{18}$");
             return regex.IsMatch(_string);
+        }
+
+        public static DateTime TimeNow()
+        {
+            return TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Romance Standard Time");
         }
     }
 }

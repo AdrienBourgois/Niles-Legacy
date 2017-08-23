@@ -14,7 +14,7 @@ namespace DiscordBot.Sym
         {
             synUser = synBot.MainUser;
 
-            string packageString = File.ReadAllText(@"PacBot.simlpk");
+            string packageString = File.ReadAllText(@"Sym\/PacBot.simlpk");
             synBot.PackageManager.LoadFromString(packageString);
         }
 

@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using DiscordBot.Managers;
+using DiscordBot.Sym;
 
 namespace DiscordBot
 {
@@ -12,6 +14,8 @@ namespace DiscordBot
         public static readonly DiscordSocketClient DiscordClient = new DiscordSocketClient();
 
         private static readonly ModuleManager Modules = new ModuleManager();
+
+        private static readonly ReactionProcess Reaction = new ReactionProcess();
 
         public enum EBotState
         {
@@ -86,7 +90,11 @@ namespace DiscordBot
             {
                 if (!(_message.Channel is IGuildChannel) && _message.Author.Id != ulong.Parse(Data.Configuration["MasterId"]))
                     BotFunctions.SendToMaster(_message, null);
-                ProcessMessage.Process(_message);
+
+                if (_message.Content.StartsWith("!"))
+                    ModuleManager.GetModule<CommandManager>().ExecuteCommand(_message);
+                if (_message.MentionedUsers.Any(_user => _user.Id == DiscordClient.CurrentUser.Id) || !(_message.Channel is IGuildChannel))
+                    Reaction.Process(_message);
             }
         }
 

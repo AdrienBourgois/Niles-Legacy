@@ -5,9 +5,5 @@
         void Start();
 
         void Stop();
-
-        void Update();
-
-        bool IsRealTime { get; set; }
     }
 }
