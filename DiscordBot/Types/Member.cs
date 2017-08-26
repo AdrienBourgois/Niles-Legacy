@@ -52,14 +52,14 @@ namespace DiscordBot.Types
                 .AddField("Dernière connexion Vocale :", LastConnection != DateTime.MinValue ? LastConnection.ToString(@"dd\/MM\/yyyy HH:mm") : "Jamais");
 
             return builder.Build();
-
         }
 
         public void Save()
         {
-            StreamWriter file = File.CreateText("Save/Members/" + DiscordUser.Username + ".json");
+            StreamWriter file = File.CreateText("Save/Members/" + DiscordUser.Id + ".json");
             dynamic saveObject = new JObject();
 
+            saveObject.Username = DiscordUser.Username;
             saveObject.Id = DiscordUser.Id;
             saveObject.LastConnection = LastConnection;
 

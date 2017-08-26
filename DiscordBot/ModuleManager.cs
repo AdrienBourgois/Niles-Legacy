@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using DiscordBot.Interface;
-using DiscordBot.Managers;
+using DiscordBot.Modules;
 
 namespace DiscordBot
 {
@@ -12,7 +12,7 @@ namespace DiscordBot
         {
             typeof(CommandManager),
             typeof(ChannelManager),
-            typeof(MembersManagers)
+            typeof(MemberManager)
         };
 
         private static readonly List<IModule> Modules = new List<IModule>();
@@ -38,6 +38,8 @@ namespace DiscordBot
                 Modules.Add(module);
                 if (module is IRealTimeModule realTimeModule)
                     realTimemodules.Add(realTimeModule);
+                if (module is IEventsModule eventsModule)
+                    eventsModule.ConnectEvents();
             }
         }
 
@@ -53,6 +55,24 @@ namespace DiscordBot
                 }
 
                 Thread.Sleep(1000);
+            }
+        }
+
+        public void Sleep()
+        {
+            foreach (IModule module in Modules)
+            {
+                if(module is IEventsModule eventsModule)
+                    eventsModule.DisconnectEvents();
+            }
+        }
+
+        public void Awake()
+        {
+            foreach (IModule module in Modules)
+            {
+                if (module is IEventsModule eventsModule)
+                    eventsModule.ConnectEvents();
             }
         }
 

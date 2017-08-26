@@ -16,15 +16,17 @@ namespace DiscordBot
 
         public static void LoadConfig()
         {
-            string content = File.ReadAllText("config.xml");
+            string content = File.ReadAllText("Config/Config.xml");
             XmlDocument document = new XmlDocument {PreserveWhitespace = false};
             document.LoadXml(content.Trim());
 
             XmlNode configNode = document.ChildNodes.Cast<XmlNode>().FirstOrDefault(_node => _node.Name == "config");
 
+            if (configNode?.ChildNodes == null) return;
+
             foreach (XmlNode node in configNode.ChildNodes)
             {
-                if(node.NodeType == XmlNodeType.Element)
+                if (node.NodeType == XmlNodeType.Element)
                     Configuration.Add(node.Name, node.InnerText);
             }
         }

@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Managers;
+using DiscordBot.Functions;
 using DiscordBot.Sym;
+using DiscordBot.Types;
 
 namespace DiscordBot
 {
@@ -73,26 +74,13 @@ namespace DiscordBot
         }
 
 #pragma warning disable CS1998
-        private static async Task OnVoiceStateUpdated(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
-        {
-            SocketGuildUser user = Data.Guild.GetUser(_socketUser.Id);
-
-            if(user.Roles.Count == 1 && user.Roles.First().IsEveryone)
-                if (_fromState.VoiceChannel != _toState.VoiceChannel)
-                    if(_toState.VoiceChannel != null)
-                        if (_toState.VoiceChannel.Name.Contains(Data.Configuration["AccueilVoiceChannelName"]) && _toState.VoiceChannel.Users.Count == 1)
-                            BotFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
-        }
-
         private static async Task OnMessageReceived(SocketMessage _message)
         {
             if(!_message.Author.IsBot)
             {
                 if (!(_message.Channel is IGuildChannel) && _message.Author.Id != ulong.Parse(Data.Configuration["MasterId"]))
-                    BotFunctions.SendToMaster(_message, null);
+                    BaseFunctions.SendToMaster(_message, null);
 
-                if (_message.Content.StartsWith("!"))
-                    ModuleManager.GetModule<CommandManager>().ExecuteCommand(_message);
                 if (_message.MentionedUsers.Any(_user => _user.Id == DiscordClient.CurrentUser.Id) || !(_message.Channel is IGuildChannel))
                     Reaction.Process(_message);
             }
@@ -128,6 +116,8 @@ namespace DiscordBot
             DisconnectEvents();
 
             DiscordClient.MessageReceived += MessageReceivedOnSleep;
+
+            Modules.Sleep();
         }
 
         private static void WakeUp()
@@ -137,6 +127,8 @@ namespace DiscordBot
             ConnectEvents();
 
             DiscordClient.MessageReceived -= MessageReceivedOnSleep;
+
+            Modules.Awake();
         }
 
         private static void ConnectEvents()
@@ -144,7 +136,6 @@ namespace DiscordBot
             DiscordClient.Log += Log;
             DiscordClient.MessageReceived += OnMessageReceived;
             DiscordClient.Ready += OnReady;
-            DiscordClient.UserVoiceStateUpdated += OnVoiceStateUpdated;
             DiscordClient.UserJoined += OnUserJoined;
         }
 
@@ -153,7 +144,6 @@ namespace DiscordBot
             DiscordClient.Log -= Log;
             DiscordClient.MessageReceived -= OnMessageReceived;
             DiscordClient.Ready -= OnReady;
-            DiscordClient.UserVoiceStateUpdated -= OnVoiceStateUpdated;
             DiscordClient.UserJoined -= OnUserJoined;
         }
 
@@ -161,6 +151,27 @@ namespace DiscordBot
         {
             Console.WriteLine(_msg.ToString());
             return null;
+        }
+
+        internal static async void SendToLog(SocketMessage _message, string _text, InputCommand _inputs = null)
+        {
+            if (_text == null)
+                return;
+
+            string replace = _text;
+            if (_text.Contains("{USER}"))
+                replace = replace.Replace("{USER}", _message.Author.Username);
+            if (_inputs != null)
+                if (_text.Contains("{PARAMETER}"))
+                    replace = replace.Replace("{PARAMETER}", _inputs.Parameters.Aggregate((_i, _j) => _i + ", " + _j));
+
+            foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
+            {
+                if (socketTextChannel.Name != Data.Configuration["LogsChannelName"]) continue;
+
+                await socketTextChannel.SendMessageAsync(replace);
+                break;
+            }
         }
     }
 }

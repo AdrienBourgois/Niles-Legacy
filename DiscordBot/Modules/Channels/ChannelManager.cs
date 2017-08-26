@@ -7,7 +7,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Interface;
 
-namespace DiscordBot.Managers
+namespace DiscordBot.Modules
 {
     internal class ChannelManager : IRealTimeModule
     {

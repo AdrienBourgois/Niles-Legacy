@@ -1,19 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using Discord;
 using Discord.WebSocket;
+using DiscordBot.Functions;
 using DiscordBot.Interface;
 using DiscordBot.Types;
 
-namespace DiscordBot.Managers
+namespace DiscordBot.Modules
 {
-    internal class CommandManager : IModule
+    internal class CommandManager : IModule, IEventsModule
     {
+        private readonly Type[] functionsClassesList =
+        {
+            typeof(BaseFunctions),
+            typeof(MemberFunctions)
+        };
+
         public CommandManager()
         {
             PrepareCommands();
+        }
+
+        private Task OnMessageReceived(SocketMessage _message)
+        {
+            if(_message.Content.StartsWith('!'))
+                ExecuteCommand(_message);
+
+            return null;
         }
 
         public readonly Dictionary<string, Command> Commands = new Dictionary<string, Command>();
@@ -22,8 +38,12 @@ namespace DiscordBot.Managers
         {
             Commands.Clear();
 
-            MethodInfo[] botTasksList = typeof(BotFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public);
-            XmlReader xmlReader = XmlReader.Create("Commands/CommandList.xml");
+            List<MethodInfo> methods = new List<MethodInfo>();
+
+            foreach (Type functionClass in functionsClassesList)
+                methods.AddRange(functionClass.GetMethods(BindingFlags.Static | BindingFlags.Public));
+
+            XmlReader xmlReader = XmlReader.Create("Config/Commands/BaseCommands.xml");
 
             while (xmlReader.Read())
             {
@@ -39,14 +59,13 @@ namespace DiscordBot.Managers
                     if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "Action")
                     {
                         Action<SocketMessage, string, char, string, List<string>> action = null;
-                        foreach (MethodInfo methodInfo in botTasksList)
+                        foreach (MethodInfo methodInfo in methods)
                             if (methodInfo.Name == xmlReader.GetAttribute("function"))
                                 action = (Action<SocketMessage, string, char, string, List<string>>)methodInfo.CreateDelegate(typeof(Action<SocketMessage, string, char, string, List<string>>));
 
                         string actionLog = xmlReader.GetAttribute("log");
 
                         xmlReader.Read();
-                        typeof(BotFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public);
                         string value = xmlReader.Value;
                         if (value == "\n    ") value = null;
                         command.AddCommand(action, value, actionLog);
@@ -62,7 +81,7 @@ namespace DiscordBot.Managers
             xmlReader.Dispose();
         }
 
-        public void ExecuteCommand(SocketMessage _message)
+        private void ExecuteCommand(SocketMessage _message)
         {
             string[] messageSplit = _message.Content.Substring(1).Split(' ');
 
@@ -80,7 +99,7 @@ namespace DiscordBot.Managers
             }
             else
                 if(command.CommandLog != "")
-                    BotFunctions.SendToLog(_message, command.CommandLog);
+                    Bot.SendToLog(_message, command.CommandLog);
 
             foreach (BotTask action in command.ActionList)
             {
@@ -96,6 +115,16 @@ namespace DiscordBot.Managers
         public void Stop()
         {
 
+        }
+
+        public void DisconnectEvents()
+        {
+            Bot.DiscordClient.MessageReceived -= OnMessageReceived;
+        }
+
+        public void ConnectEvents()
+        {
+            Bot.DiscordClient.MessageReceived += OnMessageReceived;
         }
     }
 }

@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using DiscordBot.Functions;
 using DiscordBot.Interface;
 using DiscordBot.Types;
 
-namespace DiscordBot.Managers
+namespace DiscordBot.Modules
 {
-    internal class MembersManagers : IModule
+    internal class MemberManager : IModule, IEventsModule
     {
         private readonly Dictionary<ulong, Member> members = new Dictionary<ulong, Member>();
 
         private readonly Timer timer;
 
-        public MembersManagers()
+        public MemberManager()
         {
-            Bot.DiscordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
             Bot.DiscordClient.Ready += delegate { LoadMembers(); return null; };
             timer = new Timer(SaveMembers);
         }
@@ -41,6 +42,14 @@ namespace DiscordBot.Managers
             if (_newState.VoiceChannel.Name.Contains("Absent")) return null;
 
             GetMember(_socketUser.Id).OnConnected();
+
+            SocketGuildUser user = Data.Guild.GetUser(_socketUser.Id);
+
+            if (user.Roles.Count != 1 || !user.Roles.First().IsEveryone) return null;
+            if (_previouState.VoiceChannel == _newState.VoiceChannel) return null;
+            if (_newState.VoiceChannel == null) return null;
+            if (_newState.VoiceChannel.Name.Contains(Data.Configuration["AccueilVoiceChannelName"]) && _newState.VoiceChannel.Users.Count == 1)
+                BaseFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
 
             return null;
         }
@@ -82,6 +91,16 @@ namespace DiscordBot.Managers
         {
             timer.Dispose();
             SaveMembers();
+        }
+
+        public void DisconnectEvents()
+        {
+            Bot.DiscordClient.UserVoiceStateUpdated -= OnUserVoiceStateUpdated;
+        }
+
+        public void ConnectEvents()
+        {
+            Bot.DiscordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
         }
     }
 }

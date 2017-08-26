@@ -4,14 +4,14 @@ using System.Linq;
 using System.Reflection;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Managers;
+using DiscordBot.Modules;
 using DiscordBot.Types;
 
-namespace DiscordBot
+namespace DiscordBot.Functions
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-    internal static class BotFunctions
+    internal static class BaseFunctions
     {
         public static void StopBot(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
@@ -207,7 +207,7 @@ namespace DiscordBot
         public static async void GetFunctionsNames(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
             string answer = "Liste des méthodes : \n```\n";
-            answer += typeof(BotFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public).Aggregate("", (_current, _method) => _current + (_method.Name + '\n')) + "\n```";
+            answer += typeof(BaseFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public).Aggregate("", (_current, _method) => _current + (_method.Name + '\n')) + "\n```";
             await _message.Channel.SendMessageAsync(answer);
         }
 
@@ -216,59 +216,6 @@ namespace DiscordBot
             ModuleManager.GetModule<CommandManager>().PrepareCommands();
         }
 
-        public static async void GetMemberInformations(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            if (_message.MentionedUsers.Count == 0 && (_parameters == null || _parameters.Count == 0 || !Tools.IsMemberIdValid(_parameters[0])))
-            {
-                await _message.Channel.SendMessageAsync(":negative_squared_cross_mark: Erreur : Pas de membre défini");
-                return;
-            }
 
-            ulong id = _message.MentionedUsers.Count != 0
-                ? _message.MentionedUsers.First().Id
-                : ulong.Parse(_parameters?[0]);
-
-            Member member = ModuleManager.GetModule<MembersManagers>().GetMember(id);
-            if(member != null)
-            {
-                Embed memberEmbed = member.GetEmbedInfos();
-                await _message.Channel.SendMessageAsync("", embed: memberEmbed).ConfigureAwait(false);
-            }
-            else
-            {
-                await _message.Channel.SendMessageAsync(":negative_squared_cross_mark: Erreur : Membre inconnu");
-            }
-        }
-
-        public static void SaveMembers(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            ModuleManager.GetModule<MembersManagers>().SaveMembers();
-        }
-
-        public static void LoadMembers(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            ModuleManager.GetModule<MembersManagers>().LoadMembers();
-        }
-
-        public static async void SendToLog(SocketMessage _message, string _text, InputCommand _inputs = null)
-        {
-            if (_text == null)
-                return;
-
-            string replace = _text;
-            if(_text.Contains("{USER}"))
-                replace = replace.Replace("{USER}", _message.Author.Username);
-            if(_inputs != null)
-                if (_text.Contains("{PARAMETER}"))
-                    replace = replace.Replace("{PARAMETER}", _inputs.Parameters.Aggregate((_i, _j) => _i + ", " + _j));
-
-            foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
-            {
-                if (socketTextChannel.Name != Data.Configuration["LogsChannelName"]) continue;
-
-                await socketTextChannel.SendMessageAsync(replace);
-                break;
-            }
-        }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Discord.WebSocket;
-using DiscordBot.Types;
 
-namespace DiscordBot
+namespace DiscordBot.Types
 {
     internal class Command
     {
