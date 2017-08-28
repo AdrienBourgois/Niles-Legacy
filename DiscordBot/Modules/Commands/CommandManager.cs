@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Functions;
@@ -43,42 +44,37 @@ namespace DiscordBot.Modules
             foreach (Type functionClass in functionsClassesList)
                 methods.AddRange(functionClass.GetMethods(BindingFlags.Static | BindingFlags.Public));
 
-            XmlReader xmlReader = XmlReader.Create("Config/Commands/BaseCommands.xml");
+            XmlDocument document = new XmlDocument();
+            XmlSchema schema = XmlSchema.Read(System.IO.File.OpenRead("Config/Commands/CommandsSchema.xsd"), null);
+            document.Schemas.Add(schema);
+            document.Schemas.Compile();
+            document.Load("Config/Commands/BaseCommands.xml");
+            document.Validate(delegate(object _sender, ValidationEventArgs _args) { Console.WriteLine("PrepareCommand : " + _args.Message); });
 
-            while (xmlReader.Read())
+            foreach (XmlNode commandNode in document["CommandList"].ChildNodes)
             {
-                if (xmlReader.NodeType != XmlNodeType.Element || xmlReader.Name != "Command") continue;
-                string name = xmlReader.GetAttribute("name");
-                string commandLog = xmlReader.GetAttribute("log");
-                string description = xmlReader.GetAttribute("description");
-                bool admin = xmlReader.GetAttribute("admin") == "true";
+                if (commandNode.Name != "Command") continue;
+
+                string name = commandNode.Attributes["name"].Value;
+                string description = commandNode.Attributes["description"]?.Value;
+                string commandLog = commandNode.Attributes["log"]?.Value;
+                bool admin = commandNode.Attributes["admin"]?.Value == "true";
                 Command command = new Command(name, description, commandLog, admin);
 
-                while (xmlReader.Read())
+                foreach (XmlNode actionNode in commandNode.ChildNodes)
                 {
-                    if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "Action")
-                    {
-                        Action<SocketMessage, string, char, string, List<string>> action = null;
-                        foreach (MethodInfo methodInfo in methods)
-                            if (methodInfo.Name == xmlReader.GetAttribute("function"))
-                                action = (Action<SocketMessage, string, char, string, List<string>>)methodInfo.CreateDelegate(typeof(Action<SocketMessage, string, char, string, List<string>>));
+                    if (actionNode.Name != "Action") continue;
 
-                        string actionLog = xmlReader.GetAttribute("log");
+                    MethodInfo method = methods.Find(_method => _method.Name == actionNode.Attributes["function"].Value);
+                    Action<SocketMessage, string, char, string, List<string>> action = (Action<SocketMessage, string, char, string, List<string>>)method.CreateDelegate(typeof(Action<SocketMessage, string, char, string, List<string>>));
 
-                        xmlReader.Read();
-                        string value = xmlReader.Value;
-                        if (value == "\n    ") value = null;
-                        command.AddCommand(action, value, actionLog);
-                    }
-                    else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Name == "List")
-                    {
-                        Commands.Add(name, command);
-                        break;
-                    }
+                    string actionLog = actionNode.Attributes["log"]?.Value;
+                    string value = string.IsNullOrEmpty(actionNode.InnerText) ? null : actionNode.InnerText;
+                    command.AddCommand(action, value, actionLog);
                 }
-            }
 
-            xmlReader.Dispose();
+                Commands.Add(name, command);
+            }
         }
 
         private void ExecuteCommand(SocketMessage _message)
@@ -98,7 +94,7 @@ namespace DiscordBot.Modules
                     return;
             }
             else
-                if(command.CommandLog != "")
+                if(command.CommandLog != null)
                     Bot.SendToLog(_message, command.CommandLog);
 
             foreach (BotTask action in command.ActionList)
