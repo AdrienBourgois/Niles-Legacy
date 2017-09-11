@@ -12,12 +12,14 @@ using DiscordBot.Types;
 
 namespace DiscordBot.Modules
 {
-    internal class CommandManager : IModule, IEventsModule
+    internal class CommandManager : IEventsModule
     {
-        private readonly Type[] functionsClassesList =
+        internal static readonly Type[] FunctionsClassesList =
         {
-            typeof(BaseFunctions),
-            typeof(MemberFunctions)
+            typeof(MessagesFunctions),
+            typeof(MemberFunctions),
+            typeof(BotFunctions),
+            typeof(CommandsFunctions),
         };
 
         public CommandManager()
@@ -41,7 +43,7 @@ namespace DiscordBot.Modules
 
             List<MethodInfo> methods = new List<MethodInfo>();
 
-            foreach (Type functionClass in functionsClassesList)
+            foreach (Type functionClass in FunctionsClassesList)
                 methods.AddRange(functionClass.GetMethods(BindingFlags.Static | BindingFlags.Public));
 
             XmlDocument document = new XmlDocument();
@@ -109,9 +111,7 @@ namespace DiscordBot.Modules
         }
 
         public void Stop()
-        {
-
-        }
+        {}
 
         public void DisconnectEvents()
         {

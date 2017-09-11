@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
@@ -9,7 +8,7 @@ using DiscordBot.Interface;
 
 namespace DiscordBot.Modules
 {
-    internal class ChannelManager : IRealTimeModule
+    internal class ChannelManager : IEventsModule
     {
         private readonly ConcurrentDictionary<ulong, IVoiceChannel> temporaryChannels = new ConcurrentDictionary<ulong, IVoiceChannel>();
 
@@ -24,17 +23,12 @@ namespace DiscordBot.Modules
             temporaryChannels.TryAdd(channel.Id, channel);
         }
 
-        public async void Update()
+        private async Task VerifyVoidChannels(SocketUser _socketUser, SocketVoiceState _fromState, SocketVoiceState _toState)
         {
-            await VerifyVoidChannels();
-        }
-
-        private async Task VerifyVoidChannels()
-        {
-            foreach (KeyValuePair<ulong, IVoiceChannel> channelPair in temporaryChannels)
+            if (_fromState.VoiceChannel != null && _fromState.VoiceChannel.Guild == Data.Guild && temporaryChannels.ContainsKey(_fromState.VoiceChannel.Id))
             {
-                SocketVoiceChannel channel = Data.Guild.GetVoiceChannel(channelPair.Value.Id);
-                if (channel.Users.Count != 0 || DateTimeOffset.Now < channel.CreatedAt.AddMinutes(1)) continue;
+                SocketVoiceChannel channel = _fromState.VoiceChannel;
+                if (channel.Users.Count != 0) return;
 
                 await channel.DeleteAsync();
                 temporaryChannels.TryRemove(channel.Id, out IVoiceChannel _);
@@ -65,6 +59,16 @@ namespace DiscordBot.Modules
 
                 await channel.DeleteAsync();
             }
+        }
+
+        public void DisconnectEvents()
+        {
+            Bot.DiscordClient.UserVoiceStateUpdated -= VerifyVoidChannels;
+        }
+
+        public void ConnectEvents()
+        {
+            Bot.DiscordClient.UserVoiceStateUpdated += VerifyVoidChannels;
         }
     }
 }

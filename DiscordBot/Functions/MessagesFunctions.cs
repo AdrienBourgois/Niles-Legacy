@@ -1,29 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Modules;
-using DiscordBot.Types;
 
 namespace DiscordBot.Functions
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-    internal static class BaseFunctions
+    internal static class MessagesFunctions
     {
-        public static void StopBot(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            Bot.AskToStop();
-        }
-
-        public static async void Sleep(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            await _message.Channel.SendMessageAsync("A tout à l'heure ! :wave:");
-            Bot.Sleep();
-        }
-
         public static async void React(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
         {
             SocketUserMessage userMessage = (SocketUserMessage)_message;
@@ -166,56 +152,5 @@ namespace DiscordBot.Functions
 
             ModuleManager.GetModule<ChannelManager>().CreateChannel(_message.Author, _sentence);
         }
-
-        public static async void SendHelpList(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            string answer = "Liste des commandes : \n```\n";
-            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
-            {
-                Command command = commandPair.Value;
-                if(!command.AdminCommand)
-                    answer += "- !" + command.Name + " : " + command.Description + '\n';
-            }
-            answer += "\n```";
-
-            await _message.Channel.SendMessageAsync(answer);
-        }
-
-        public static async void SendAdminHelpList(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            string answer = "Liste des commandes : \n```\n";
-            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
-            {
-                Command command = commandPair.Value;
-                if (!command.AdminCommand)
-                    answer += "- !" + command.Name + " : " + command.Description + '\n';
-            }
-            answer += "```\nListe des commandes administateurs : \n```\n";
-
-            foreach (KeyValuePair<string, Command> commandPair in ModuleManager.GetModule<CommandManager>().Commands)
-            {
-                Command command = commandPair.Value;
-                if (command.AdminCommand)
-                    answer += "- !" + command.Name + " : " + command.Description + '\n';
-            }
-
-            answer += "\n```";
-
-            await _message.Channel.SendMessageAsync(answer);
-        }
-
-        public static async void GetFunctionsNames(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            string answer = "Liste des méthodes : \n```\n";
-            answer += typeof(BaseFunctions).GetMethods(BindingFlags.Static | BindingFlags.Public).Aggregate("", (_current, _method) => _current + (_method.Name + '\n')) + "\n```";
-            await _message.Channel.SendMessageAsync(answer);
-        }
-
-        public static void ReloadConfig(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)
-        {
-            ModuleManager.GetModule<CommandManager>().PrepareCommands();
-        }
-
-
     }
 }

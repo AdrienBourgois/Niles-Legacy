@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Discord;
 using Discord.WebSocket;
@@ -7,6 +8,8 @@ using DiscordBot.Types;
 
 namespace DiscordBot.Functions
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     internal static class MemberFunctions
     {
         public static async void GetMemberInformations(SocketMessage _message, string _sentence, char _discriminator = '!', string _commandName = null, List<string> _parameters = null)

@@ -1,0 +1,3 @@
+﻿On souhaite la bienvenue à {USER} !
+On a un petit nouveau dans la communauté ! Bienvenue à toi {USER} !
+Hey les gars, je vous présente {USER}, on lui souhaite bon courage parmis nous !

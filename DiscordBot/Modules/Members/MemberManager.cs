@@ -11,7 +11,7 @@ using DiscordBot.Types;
 
 namespace DiscordBot.Modules
 {
-    internal class MemberManager : IModule, IEventsModule
+    internal class MemberManager : IEventsModule
     {
         private readonly Dictionary<ulong, Member> members = new Dictionary<ulong, Member>();
 
@@ -49,7 +49,7 @@ namespace DiscordBot.Modules
             if (_previouState.VoiceChannel == _newState.VoiceChannel) return null;
             if (_newState.VoiceChannel == null) return null;
             if (_newState.VoiceChannel.Name.Contains(Data.Configuration["AccueilVoiceChannelName"]) && _newState.VoiceChannel.Users.Count == 1)
-                BaseFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
+                MessagesFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
 
             return null;
         }

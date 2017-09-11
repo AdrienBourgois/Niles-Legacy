@@ -39,7 +39,7 @@ namespace DiscordBot
         {
             State = EBotState.Starting;
 
-            Data.LoadConfig();
+            Data.Load();
 
             ConnectEvents();
 
@@ -69,8 +69,10 @@ namespace DiscordBot
 
         private static async Task OnUserJoined(SocketGuildUser _socketGuildUser)
         {
+            if (_socketGuildUser.Guild.Id != Data.Guild.Id) return;
+
             await _socketGuildUser.GetOrCreateDMChannelAsync().Result.SendMessageAsync(Data.Configuration["WelcomeMessage"]);
-            await Data.Guild.TextChannels.First(_x => _x.Name.Contains(Data.Configuration["GeneralChannelName"])).SendMessageAsync("On souhaite la bienvenue à " + _socketGuildUser.Username + " !");
+            await Data.Guild.TextChannels.First(_x => _x.Name.Contains(Data.Configuration["GeneralChannelName"])).SendMessageAsync(Data.GetRandomSentence(Data.SentenceType.Welcome, "USER", _socketGuildUser.Username));
         }
 
 #pragma warning disable CS1998
@@ -79,7 +81,7 @@ namespace DiscordBot
             if(!_message.Author.IsBot)
             {
                 if (!(_message.Channel is IGuildChannel) && _message.Author.Id != ulong.Parse(Data.Configuration["MasterId"]))
-                    BaseFunctions.SendToMaster(_message, null);
+                    MessagesFunctions.SendToMaster(_message, null);
 
                 if (_message.MentionedUsers.Any(_user => _user.Id == DiscordClient.CurrentUser.Id) || !(_message.Channel is IGuildChannel))
                     Reaction.Process(_message);
@@ -163,7 +165,7 @@ namespace DiscordBot
                 replace = replace.Replace("{USER}", _message.Author.Username);
             if (_inputs != null)
                 if (_text.Contains("{PARAMETER}"))
-                    replace = replace.Replace("{PARAMETER}", _inputs.Parameters.Aggregate((_i, _j) => _i + ", " + _j));
+                    replace = replace.Replace("{PARAMETER}", _inputs.Sentence);
 
             foreach (SocketTextChannel socketTextChannel in Data.Guild.TextChannels)
             {

@@ -35,7 +35,7 @@
     <Action function="ReloadConfig" />
   </Command>
   <Command name="functions" admin="true" description="Méthodes internes du bot utilisables pour le fichier de configuration">
-    <Action function="GetFunctionsNames" />
+    <Action function="GetFunctionsList" />
   </Command>
   <Command name="member" admin="true" description="Donne les informations du membre">
     <Action function="GetMemberInformations" />
