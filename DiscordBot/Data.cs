@@ -52,6 +52,7 @@ namespace DiscordBot
         public enum SentenceType
         {
             Welcome,
+            StaffNewbieOnVoiceChannel,
         }
 
         public static string GetRandomSentence(SentenceType _type, string _tagToReplace, string _data)

@@ -23,16 +23,13 @@ namespace DiscordBot.Types
 
         public Member(string _memberUsername)
         {
-            StreamReader file = File.OpenText("Save/Members/" + _memberUsername);
+            string fileContent = File.ReadAllText("Save/Members/" + _memberUsername);
 
-            dynamic memberDatas = JObject.Parse(file.ReadToEnd());
+            dynamic memberDatas = JObject.Parse(fileContent);
             DiscordUser = Data.Guild.GetUser((ulong)memberDatas.Id);
             if (DiscordUser == null) return;
 
             LastConnection = memberDatas.LastConnection;
-
-            file.Close();
-            file.Dispose();
 
             IsValid = true;
         }
@@ -56,17 +53,13 @@ namespace DiscordBot.Types
 
         public void Save()
         {
-            StreamWriter file = File.CreateText("Save/Members/" + DiscordUser.Id + ".json");
             dynamic saveObject = new JObject();
 
             saveObject.Username = DiscordUser.Username;
             saveObject.Id = DiscordUser.Id;
             saveObject.LastConnection = LastConnection;
 
-            file.Write(saveObject.ToString());
-            file.Flush();
-            file.Close();
-            file.Dispose();
+            File.WriteAllText("Save/Members/" + DiscordUser.Id + ".json", saveObject.ToString());
         }
 
         public bool IsValid { get; }

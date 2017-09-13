@@ -49,7 +49,7 @@ namespace DiscordBot.Modules
             if (_previouState.VoiceChannel == _newState.VoiceChannel) return null;
             if (_newState.VoiceChannel == null) return null;
             if (_newState.VoiceChannel.Name.Contains(Data.Configuration["AccueilVoiceChannelName"]) && _newState.VoiceChannel.Users.Count == 1)
-                MessagesFunctions.SendToConnectedStaffMembers(null, _socketUser.Username + " vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !");
+                MessagesFunctions.SendToConnectedStaffMembers(null, Data.GetRandomSentence(Data.SentenceType.StaffNewbieOnVoiceChannel, "USER", user.Username));
 
             return null;
         }
@@ -69,13 +69,7 @@ namespace DiscordBot.Modules
 
         public void SaveMembers(object _object = null)
         {
-            if (Directory.Exists("Save/Members"))
-            {
-                DirectoryInfo memberDirectory = new DirectoryInfo("Save/Members");
-                foreach (FileInfo fileInfo in memberDirectory.GetFiles())
-                    fileInfo.Delete();
-            }
-            else
+            if (!Directory.Exists("Save/Members"))
                 Directory.CreateDirectory("Save/Members");
 
             foreach (Member member in members.Values)

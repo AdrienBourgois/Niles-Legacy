@@ -1,0 +1,3 @@
+﻿{USER} vient de se connecter sur l'accueil ! Il est tout seul, ce serait cool de venir l'accueillir !
+On a {USER} tout seul dans l'accueil, je répète, on a {USER} tout seul dans l'acueil !
+ARGH ! J'en peux plus de {USER} dans l'accueil, démerdez vous avec lui... Je passe mon tour...
