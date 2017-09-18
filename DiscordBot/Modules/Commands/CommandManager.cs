@@ -14,6 +14,8 @@ namespace DiscordBot.Modules
 {
     internal class CommandManager : IEventsModule
     {
+        private int runningCommands;
+
         internal static readonly Type[] FunctionsClassesList =
         {
             typeof(MessagesFunctions),
@@ -85,6 +87,8 @@ namespace DiscordBot.Modules
 
             if (!Commands.ContainsKey(messageSplit[0])) return;
 
+            runningCommands++;
+
             Command command = Commands[messageSplit[0]];
 
             if (_message.Source != MessageSource.User)
@@ -103,6 +107,8 @@ namespace DiscordBot.Modules
             {
                 action.Execute(_message);
             }
+
+            runningCommands--;
         }
 
         public void Start()
@@ -111,7 +117,10 @@ namespace DiscordBot.Modules
         }
 
         public void Stop()
-        {}
+        {
+            while (runningCommands != 0)
+            {}
+        }
 
         public void DisconnectEvents()
         {

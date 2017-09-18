@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -20,49 +19,38 @@ namespace DiscordBot
 
         public enum EBotState
         {
-            Starting,
-            Ready,
             Running,
             Sleep,
             AskToShutdown,
-            ReadyToShutdown,
-            Shutdown,
-            Exit
+            ReadyToShutdown
         }
 
         internal static EBotState State { get; set; }
 
         public static void Main()
-            => MainAsync().GetAwaiter().GetResult();
-
-        private static async Task MainAsync()
         {
-            State = EBotState.Starting;
-
             Data.Load();
-
             ConnectEvents();
 
-            await DiscordClient.LoginAsync(TokenType.Bot, Data.Token);
-            State = EBotState.Ready;
-
-            await DiscordClient.StartAsync();
-            State = EBotState.Running;
-
+            StartClientAsync().GetAwaiter().GetResult();
             Modules.Start();
+
+            State = EBotState.Running;
 
             Modules.Update();
 
-            State = EBotState.Shutdown;
-
-            await Shutdown();
-
-            State = EBotState.Exit;
+            Modules.Shutdown();
+            StopClientAsync().GetAwaiter().GetResult();
         }
 
-        private static async Task Shutdown()
+        private static async Task StartClientAsync()
         {
-            Modules.Shutdown();
+            await DiscordClient.LoginAsync(TokenType.Bot, Data.Configuration["Token"]);
+            await DiscordClient.StartAsync();
+        }
+
+        private static async Task StopClientAsync()
+        {
             await DiscordClient.LogoutAsync();
             await DiscordClient.StopAsync();
         }
@@ -107,7 +95,6 @@ namespace DiscordBot
         public static void AskToStop()
         {
             DisconnectEvents();
-            Thread.Sleep(500);
             State = EBotState.AskToShutdown;
         }
 

@@ -13,8 +13,6 @@ namespace DiscordBot
 
         private static readonly Dictionary<SentenceType, string[]> Sentences = new Dictionary<SentenceType, string[]>();
 
-        public static string Token { get; } = "(YOUR TOKEN)";
-
         public static SocketGuild Guild { get; set; }
 
         public static void Load()
