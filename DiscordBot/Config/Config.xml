@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <Token>(YOUR TOKEN)</Token>
-
   <GuildId>157679653551603713</GuildId> <!-- 157679653551603713 PAC || 310114754012381186 Test -->
   <MasterId>156607889958502401</MasterId>
 

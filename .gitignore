@@ -296,3 +296,6 @@ __pycache__/
 
 #Save Files
 DiscordBot/Save/
+
+#Token File
+DiscordBot/Config/Token.txt

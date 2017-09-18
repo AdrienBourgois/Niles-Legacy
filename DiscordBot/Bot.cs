@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -29,6 +30,12 @@ namespace DiscordBot
 
         public static void Main()
         {
+            if (!File.Exists("Config/Token.txt"))
+            {
+                Console.WriteLine("Bot don't have any token, can't start...");
+                return;
+            }
+
             Data.Load();
             ConnectEvents();
 
@@ -45,7 +52,7 @@ namespace DiscordBot
 
         private static async Task StartClientAsync()
         {
-            await DiscordClient.LoginAsync(TokenType.Bot, Data.Configuration["Token"]);
+            await DiscordClient.LoginAsync(TokenType.Bot, File.ReadAllText("Config/Token.txt"));
             await DiscordClient.StartAsync();
         }
 
