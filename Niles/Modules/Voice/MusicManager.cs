@@ -14,10 +14,10 @@ namespace Niles.Modules.Voice
         private SocketVoiceChannel currentChannel;
         private IAudioClient client;
 
-        public async void Connect()
+        public async void Connect(SocketVoiceChannel _channel)
         {
             if (client != null) return;
-            currentChannel = Data.Guild.VoiceChannels.First();
+            currentChannel = _channel;
             client = await currentChannel.ConnectAsync();
         }
 

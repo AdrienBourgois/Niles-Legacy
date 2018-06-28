@@ -1,4 +1,6 @@
-﻿using Niles.Modules.Voice;
+﻿using System.Linq;
+using Discord.WebSocket;
+using Niles.Modules.Voice;
 using Niles.Types;
 
 namespace Niles.Functions
@@ -6,9 +8,21 @@ namespace Niles.Functions
     [FunctionClass]
     internal class VoiceFunctions
     {
-        public static void ConnectVoice(ParsedMessage _message)
+        public static async void ConnectVoice(ParsedMessage _message)
         {
-            ModuleManager.GetModule<MusicManager>().Connect();
+            if (string.IsNullOrEmpty(_message.Sentence))
+            {
+                await _message.Message.Channel.SendMessageAsync(":negative_squared_cross_mark: Error : Any channel name provided");
+                return;
+            }
+
+            SocketVoiceChannel channel = Data.Guild.VoiceChannels.First(_x => _x.Name == _message.Sentence);
+            if (channel == null)
+            {
+                await _message.Message.Channel.SendMessageAsync(":negative_squared_cross_mark: Error : Any channel with this name");
+                return;
+            }
+            ModuleManager.GetModule<MusicManager>().Connect(channel);
         }
 
         public static void DisconnectVoice(ParsedMessage _message)
