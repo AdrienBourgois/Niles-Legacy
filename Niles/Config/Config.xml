@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <GuildId>460949165048987649</GuildId>
+  <MasterId>156607889958502401</MasterId>
+
+  <StaffRoleName>Staff</StaffRoleName>
+
+  <GeneralChannelName>general</GeneralChannelName>
+  <AnnoncesChannelName>annonces</AnnoncesChannelName>
+  <LogsChannelName>logs</LogsChannelName>
+  <StaffChannelName>staff</StaffChannelName>
+
+  <AccueilVoiceChannelName>Accueil</AccueilVoiceChannelName>
+
+  <WelcomeMessage>Bonjour !
+Au nom de la P.A.C., je te souhaite la bienvenue ! Je suis le bot de ce serveur.
+Je viens de prévenir les membres du Staff actuellement connectés sur le serveur, ils ne devraient pas tarder à arriver ! Je te conseil de te mettre sur notre channel vocal d'accueil, ils pourront t'accueillir !
+Tu peux, en attendant visiter notre site (https://www.pa-corp.fr/), et même y déposer ta candidature si tu le souhaites !
+A bientôt !
+  </WelcomeMessage>
+</config>
