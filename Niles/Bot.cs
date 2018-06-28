@@ -69,12 +69,12 @@ namespace Niles
 #pragma warning disable CS1998
         private static async Task OnMessageReceived(SocketMessage _message)
         {
-            /*if(!_message.Author.IsBot)
+            if(!_message.Author.IsBot)
             {
                 if (!(_message.Channel is IGuildChannel) && _message.Author.Id != ulong.Parse(Data.Configuration["MasterId"]))
-                    MessagesFunctions.SendToMaster(_message, null);
-            }*/
-            //TODO : Rework with new ParsedMessage
+                    await DiscordClient.GetUser(ulong.Parse(Data.Configuration["MasterId"])).GetOrCreateDMChannelAsync()
+                        .Result.SendMessageAsync("Send from " + _message.Author + " : " + _message.Content);
+            }
         }
 
         private static async Task MessageReceivedOnSleep(SocketMessage _message)
